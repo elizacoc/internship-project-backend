@@ -1,0 +1,23 @@
+server:
+  port : 8081
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/projectinternship
+    username: postgres
+    password: HIkoorikaze99
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQL82Dialect
+      format_sql: true
+      hibernate: 
+       show-sql: true
+       format_sql: true
+    open-in-view: false
+
+logging:
+   level:
+     '[com.kronsoft.internship.service]': TRACE
+     '[com.kronsoft.internship.controllers]': DEBUG
+      

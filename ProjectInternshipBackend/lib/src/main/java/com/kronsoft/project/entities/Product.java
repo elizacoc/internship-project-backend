@@ -11,7 +11,9 @@ import javax.validation.constraints.Size;
 
 import org.springframework.beans.BeanUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kronsoft.project.dto.ProductDto;
+import com.kronsoft.project.validators.PznConstraint;
 
 @Entity
 @Table(name = "products")
@@ -19,7 +21,8 @@ public class Product {
 	
 	@Id
 	@Column(name = "pzn", length = 8 , unique = true, nullable = false)
-	@Size(min = 8, max = 8, message = "Pzn must less or equal than 8 characters!")
+	@PznConstraint
+	@Size(max = 8, message = "Pzn must be 8 characters!")
 	@NotBlank(message = "Pzn cannot be blank!")
 	private String pzn;
 	
@@ -47,6 +50,7 @@ public class Product {
 	@NotBlank(message = "Unit cannot be blank!")
 	private String unit;
 	
+	@JsonIgnore
 	@OneToOne(mappedBy = "product", cascade = CascadeType.REMOVE)
 	private Stock stock;
 	
@@ -55,7 +59,7 @@ public class Product {
 	}
 	
 	public Product(ProductDto product) {
-		BeanUtils.copyProperties(product, this);
+		BeanUtils.copyProperties(product, this, "stock");
 	}
 
 	public String getPzn() {
@@ -105,5 +109,15 @@ public class Product {
 	public void setUnit(String unit) {
 		this.unit = unit;
 	}
+
+	public Stock getStock() {
+		return stock;
+	}
+
+	public void setStock(Stock stock) {
+		this.stock = stock;
+	}
+	
+	
 	
 }

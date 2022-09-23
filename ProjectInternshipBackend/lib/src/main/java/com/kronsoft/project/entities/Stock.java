@@ -31,7 +31,7 @@ public class Stock {
 	@NotNull(message = "Quantity cannot be null!")
 	private Long quantity;
 	
-	@Column(name = "price", nullable = false, precision = 2)
+	@Column(name = "price", nullable = false, scale = 2)
 	@NotNull(message = "Price cannot be null!")
 	private BigDecimal price;
 	
@@ -46,6 +46,7 @@ public class Stock {
 	
 	public Stock(StockDto stock) {
 		BeanUtils.copyProperties(stock, this);
+		this.product = new Product(stock.getProduct());
 	}
 
 	public Long getId() {

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kronsoft.project.dto.ProductDto;
+import com.kronsoft.project.dto.StockDto;
 import com.kronsoft.project.exceptions.PznAlreadyExistsException;
 import com.kronsoft.project.services.ProductService;
 
@@ -32,14 +33,20 @@ public class ProductController {
 				.map(product -> new ProductDto(product))
 				.collect(Collectors.toList());
 	}
+
+	
+	@GetMapping(value = "/{pzn}",produces = MediaType.APPLICATION_JSON_VALUE)
+	public ProductDto getProductByPzn(@PathVariable String pzn) {
+		return productService.getProductByPzn(pzn);
+	}
 	
 	@PostMapping(value = "/create", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ProductDto createProduct(@RequestBody ProductDto product) throws PznAlreadyExistsException {
 		return productService.productToCreate(product);
 	}
 	
-	@PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ProductDto updateProduct(@RequestBody ProductDto product) {
+	@PutMapping(value = "/update/{pzn}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ProductDto updateProduct(@PathVariable String pzn, @RequestBody ProductDto product) {
 		return productService.productToUpdate(product);
 	}
 	

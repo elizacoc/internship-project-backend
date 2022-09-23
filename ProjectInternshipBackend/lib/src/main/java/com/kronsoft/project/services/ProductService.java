@@ -1,6 +1,8 @@
 package com.kronsoft.project.services;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -18,7 +20,9 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.kronsoft.project.dao.ProductRepository;
 import com.kronsoft.project.dao.StockRepository;
 import com.kronsoft.project.dto.ProductDto;
+import com.kronsoft.project.dto.StockDto;
 import com.kronsoft.project.entities.Product;
+import com.kronsoft.project.entities.Stock;
 import com.kronsoft.project.exceptions.PznAlreadyExistsException;
 
 @Service
@@ -49,7 +53,13 @@ public class ProductService {
 	}
 	
 	public List<Product> getAllProducts(){
-		return productRepository.findAll();
+		List<Product> productList = productRepository.findAll();
+		for(Product product : productList) {
+			if(!stockRepository.existsByProductPzn(product.getPzn())) {
+				createStockForProduct(new ProductDto(product));
+			}
+		}
+		return productList;
 	}
 	
 	public ProductDto productToCreate(ProductDto productDto) throws PznAlreadyExistsException {
@@ -62,6 +72,9 @@ public class ProductService {
 			throw new PznAlreadyExistsException(pzn);
 		}
 		Product product = new Product(productDto);
+		productRepository.save(product);
+		createStockForProduct(productDto);
+		
 		return new ProductDto(productRepository.save(product));
 		
 	}
@@ -82,7 +95,20 @@ public class ProductService {
 	}
 	
 	private String leftPadding(String stringToFormat) {
-		return String.format("%1$" + stringToFormat.length() + "s", stringToFormat).replace(' ', '0');
+		return String.format("%1$" + 8 + "s", stringToFormat).replace(' ', '0');
+	}
+
+	public ProductDto getProductByPzn(String pzn) {
+		ProductDto productDto = productRepository.findByPzn(pzn);
+		return productDto;
 	}
 	
+	private StockDto createStockForProduct(ProductDto product) {
+		Stock stock = new Stock();
+		stock.setPrice(new BigDecimal(0.00).setScale(2, RoundingMode.HALF_EVEN));
+		stock.setQuantity(0L);
+		stock.setProduct(new Product(product));
+		StockDto stockDto = new StockDto(stock);
+		return stockService.stockToPersist(stockDto);
+	}
 }

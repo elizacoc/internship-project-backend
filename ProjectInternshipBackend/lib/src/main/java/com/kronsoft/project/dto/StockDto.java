@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 import org.springframework.beans.BeanUtils;
 
-import com.kronsoft.project.entities.Product;
 import com.kronsoft.project.entities.Stock;
 
 public class StockDto {
@@ -15,14 +14,17 @@ public class StockDto {
 	
 	private BigDecimal price;
 	
-	private Product product;
+	private ProductDto product;
+	
+	//private String productPzn;
 	
 	public StockDto() {
 		
 	}
 	
 	public StockDto(Stock stock) {
-		BeanUtils.copyProperties(stock, this, "stock");
+		BeanUtils.copyProperties(stock, this);
+		this.product = new ProductDto(stock.getProduct());
 	}
 
 	public Long getId() {
@@ -49,11 +51,11 @@ public class StockDto {
 		this.price = price;
 	}
 
-	public Product getProduct() {
+	public ProductDto getProduct() {
 		return product;
 	}
 
-	public void setProduct(Product product) {
+	public void setProduct(ProductDto product) {
 		this.product = product;
 	}
 	

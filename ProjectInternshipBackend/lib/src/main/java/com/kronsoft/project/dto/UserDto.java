@@ -4,9 +4,13 @@ import java.time.LocalDateTime;
 
 import org.springframework.beans.BeanUtils;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.kronsoft.project.entities.UserEntity;
 import com.kronsoft.project.validators.PasswordConstraint;
 import com.kronsoft.project.validators.PasswordSizeConstraint;
+
+import io.swagger.annotations.ApiModelProperty;
 
 public class UserDto {
 	private Long id;
@@ -15,10 +19,17 @@ public class UserDto {
 	
 	private String username;
 	
+	private String firstName;
+	
+	private String lastName;
+	
 	@PasswordSizeConstraint
 	@PasswordConstraint
 	private String password;
 	
+	
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = Shape.STRING)
+	@ApiModelProperty(required = true, example = "2021-08-20 05:07:30")
 	private LocalDateTime creationDate;
 	
 	public UserDto() {
@@ -26,7 +37,7 @@ public class UserDto {
 	}
 	
 	public UserDto(UserEntity user) {
-		BeanUtils.copyProperties(user, this, password);
+		BeanUtils.copyProperties(user, this, "password");
 	}
 
 	public Long getId() {
@@ -57,6 +68,7 @@ public class UserDto {
 		return password;
 	}
 
+	
 	public void setPassword(String password) {
 		this.password = password;
 	}
@@ -67,5 +79,21 @@ public class UserDto {
 
 	public void setCreationDate(LocalDateTime creationDate) {
 		this.creationDate = creationDate;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 }

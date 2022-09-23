@@ -23,7 +23,7 @@ public class ProductDto {
 	}
 
 	public ProductDto(Product product) {
-		BeanUtils.copyProperties(product, this);
+		BeanUtils.copyProperties(product, this, "stock");
 	}
 
 	public String getPzn() {

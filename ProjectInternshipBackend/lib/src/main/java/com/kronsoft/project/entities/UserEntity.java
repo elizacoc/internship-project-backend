@@ -31,6 +31,14 @@ public class UserEntity {
 	@NotNull(message = "Id cannot be null!")
 	private Long id;
 	
+	@Column(name = "first_name", nullable = false)
+	@NotBlank(message = "First name cannot be blank!")
+	private String firstName;
+	
+	@Column(name = "last_name", nullable = false)
+	@NotBlank(message = "Last name cannot be blank!")
+	private String lastName;
+	
 	@Column(name = "email", unique = true, nullable = false)
 	@EmailConstraint
 	@NotBlank(message = "Email cannot be blank!")
@@ -47,8 +55,8 @@ public class UserEntity {
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = Shape.STRING)
 	@ApiModelProperty(required = true, example = "2021-08-20 05:07:30")
-	@Column(name = "creation_date", nullable = false)
 	@NotNull(message = "Creation date cannot be null!")
+	@Column(name = "creation_date", nullable = false)
 	private LocalDateTime creationDate;
 	
 	public UserEntity() {
@@ -98,6 +106,21 @@ public class UserEntity {
 	public void setCreationDate(LocalDateTime creationDate) {
 		this.creationDate = creationDate;
 	}
-	
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
 	
 }

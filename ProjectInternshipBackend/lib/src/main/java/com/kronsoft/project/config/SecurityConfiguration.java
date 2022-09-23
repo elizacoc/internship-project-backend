@@ -1,5 +1,7 @@
 package com.kronsoft.project.config;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -47,11 +49,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 		http.csrf().disable();
 		http.authorizeHttpRequests()
 			.antMatchers("/user/register").permitAll()
-			.antMatchers("/products/**", "/stocks/**", "/user/**").permitAll()
+			.antMatchers("/products/**", "/stocks/**", "/user/**").authenticated()
 		.and().formLogin()
-			.defaultSuccessUrl("/swagger-ui/index.html")
+//			.defaultSuccessUrl("/swagger-ui/index.html")
+			.defaultSuccessUrl("/products")
 			.failureHandler(new CustomAuthenticationFailureHandler())
-		.and().logout()
+		.and().logout().logoutSuccessHandler((request, response, authentication) -> {
+            response.setStatus(HttpServletResponse.SC_OK);
+        })
 			.logoutSuccessUrl("/")
 			.deleteCookies("JSESSIONID")
 			.clearAuthentication(true);

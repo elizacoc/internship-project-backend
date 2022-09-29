@@ -3,6 +3,7 @@ package com.kronsoft.project.dto;
 import org.springframework.beans.BeanUtils;
 
 import com.kronsoft.project.entities.Product;
+import com.kronsoft.project.entities.ProductUnit;
 
 public class ProductDto {
 
@@ -16,7 +17,7 @@ public class ProductDto {
 	
 	private String packageSize;
 	
-	private String unit;
+	private ProductUnit unit;
 	
 	public ProductDto() {
 		
@@ -66,11 +67,11 @@ public class ProductDto {
 		this.packageSize = packageSize;
 	}
 
-	public String getUnit() {
+	public ProductUnit getUnit() {
 		return unit;
 	}
 
-	public void setUnit(String unit) {
+	public void setUnit(ProductUnit unit) {
 		this.unit = unit;
 	}
 	

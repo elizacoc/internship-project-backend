@@ -3,10 +3,13 @@ package com.kronsoft.project.entities;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.springframework.beans.BeanUtils;
@@ -46,9 +49,10 @@ public class Product {
 	private String packageSize;
 	
 	@Column(name = "unit", length = 2, nullable = false)
-	@Size(max = 2, message = "Unit must be less or equal than 2 characters!")
-	@NotBlank(message = "Unit cannot be blank!")
-	private String unit;
+//	@Size(max = 2, message = "Unit must be less or equal than 2 characters!")
+	@NotNull(message = "Unit cannot be null!")
+	@Enumerated(EnumType.STRING)
+	private ProductUnit unit;
 	
 	@JsonIgnore
 	@OneToOne(mappedBy = "product", cascade = CascadeType.REMOVE)
@@ -102,11 +106,11 @@ public class Product {
 		this.packageSize = packageSize;
 	}
 
-	public String getUnit() {
+	public ProductUnit getUnit() {
 		return unit;
 	}
 
-	public void setUnit(String unit) {
+	public void setUnit(ProductUnit unit) {
 		this.unit = unit;
 	}
 

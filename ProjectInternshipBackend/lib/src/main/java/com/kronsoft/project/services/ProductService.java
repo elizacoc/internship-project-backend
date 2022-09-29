@@ -1,17 +1,21 @@
 package com.kronsoft.project.services;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.EntityNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.MappingIterator;
@@ -20,9 +24,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import com.kronsoft.project.dao.ProductRepository;
 import com.kronsoft.project.dao.StockRepository;
 import com.kronsoft.project.dto.ProductDto;
-import com.kronsoft.project.dto.StockDto;
 import com.kronsoft.project.entities.Product;
-import com.kronsoft.project.entities.Stock;
 import com.kronsoft.project.exceptions.PznAlreadyExistsException;
 
 @Service
@@ -52,11 +54,15 @@ public class ProductService {
 		}
 	}
 	
+	private String leftPadding(String stringToFormat) {
+		return String.format("%1$" + 8 + "s", stringToFormat).replace(' ', '0');
+	}
+	
 	public List<Product> getAllProducts(){
-		List<Product> productList = productRepository.findAll();
+		List<Product> productList = productRepository.findAll(Sort.by(Sort.Direction.ASC, "productName"));
 		for(Product product : productList) {
 			if(!stockRepository.existsByProductPzn(product.getPzn())) {
-				createStockForProduct(new ProductDto(product));
+				stockService.createStockForProduct(new ProductDto(product));
 			}
 		}
 		return productList;
@@ -64,6 +70,9 @@ public class ProductService {
 	
 	public ProductDto productToCreate(ProductDto productDto) throws PznAlreadyExistsException {
 		String pzn = productDto.getPzn();
+		if(Objects.isNull(pzn)) {
+			throw new DataIntegrityViolationException("Pzn must not be null!");
+		}
 		if(pzn.length() != 0)
 		{
 			productDto.setPzn(leftPadding(pzn));
@@ -73,42 +82,38 @@ public class ProductService {
 		}
 		Product product = new Product(productDto);
 		productRepository.save(product);
-		createStockForProduct(productDto);
+		stockService.createStockForProduct(productDto);
 		
 		return new ProductDto(productRepository.save(product));
 		
 	}
 	
 	public ProductDto productToUpdate(ProductDto productDto) {
-		String pzn = productDto.getPzn();
-		if(pzn.length() != 0)
-		{
-			productDto.setPzn(leftPadding(pzn));
-		}
-		Product product = new Product(productDto);
-		return new ProductDto(productRepository.save(product));
+		Optional<Product> productOpt = productRepository.findById(productDto.getPzn());
 		
+		if(productOpt.isPresent()) {
+			Product product = productOpt.get();
+			BeanUtils.copyProperties(productDto, product, "stock");
+			return new ProductDto(productRepository.save(product));
+		} else {
+			throw new EntityNotFoundException("Product with pzn " + productDto.getPzn() + " could not be found!");
+		}		
 	}
 	
 	public void deleteProduct(String pzn) {
 		productRepository.deleteById(pzn);
 	}
-	
-	private String leftPadding(String stringToFormat) {
-		return String.format("%1$" + 8 + "s", stringToFormat).replace(' ', '0');
-	}
 
 	public ProductDto getProductByPzn(String pzn) {
-		ProductDto productDto = productRepository.findByPzn(pzn);
-		return productDto;
+		Optional<Product> productOpt = productRepository.findById(pzn);
+		
+		if(productOpt.isPresent()) {
+			Product product = productOpt.get();
+			return new ProductDto(product);
+		} else {
+			throw new EntityNotFoundException("Pzn " + pzn + " not found");
+		}
 	}
 	
-	private StockDto createStockForProduct(ProductDto product) {
-		Stock stock = new Stock();
-		stock.setPrice(new BigDecimal(0.00).setScale(2, RoundingMode.HALF_EVEN));
-		stock.setQuantity(0L);
-		stock.setProduct(new Product(product));
-		StockDto stockDto = new StockDto(stock);
-		return stockService.stockToPersist(stockDto);
-	}
+	
 }

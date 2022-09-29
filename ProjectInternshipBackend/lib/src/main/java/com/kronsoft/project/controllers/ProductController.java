@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kronsoft.project.dto.ProductDto;
-import com.kronsoft.project.dto.StockDto;
 import com.kronsoft.project.exceptions.PznAlreadyExistsException;
 import com.kronsoft.project.services.ProductService;
 

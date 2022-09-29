@@ -1,5 +1,7 @@
 package com.kronsoft.project.validators;
 
+import java.util.Objects;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -9,6 +11,9 @@ public class EmailValidator implements ConstraintValidator<EmailConstraint, Stri
 	
 	@Override
 	public boolean isValid(String email, ConstraintValidatorContext context) {
+		if(Objects.isNull(email)) {
+			return false;
+		}
 		if(!email.matches(EMAIL_VALID_FORMAT)){
 			return false;
 		}

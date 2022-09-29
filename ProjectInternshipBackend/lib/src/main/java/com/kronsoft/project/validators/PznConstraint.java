@@ -15,7 +15,7 @@ import javax.validation.Payload;
 @Target({ElementType.FIELD})
 @Constraint(validatedBy = {PznValidator.class})
 public @interface PznConstraint {
-	String message() default "The pzn must contain only numbers!";
+	String message() default "The pzn must not be null and contain only numbers!";
 	Class<?>[] groups() default { };
 	Class<? extends Payload>[] payload() default { };
 }

@@ -2,8 +2,10 @@ package com.kronsoft.project.controllers.advice;
 
 import java.util.FormatFlagsConversionMismatchException;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.ConstraintViolationException;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.kronsoft.project.exceptions.PznAlreadyExistsException;
 import com.kronsoft.project.exceptions.UsernameAlreadyExistsException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.kronsoft.project.exceptions.EmailAlreadyExistsException;
 
 @ControllerAdvice
@@ -55,4 +58,18 @@ public class ControllerExceptionHandler {
 		return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<String> dataIntegrityViolationException(DataIntegrityViolationException e){
+		return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(InvalidFormatException.class)
+	public ResponseEntity<String> invalidFormatException(InvalidFormatException e){
+		return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ResponseEntity<String> entityNotFoundException(EntityNotFoundException e){
+		return new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+	}
 }

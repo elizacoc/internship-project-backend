@@ -1,5 +1,7 @@
 package com.kronsoft.project.services;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,11 +9,14 @@ import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.kronsoft.project.dao.ProductRepository;
 import com.kronsoft.project.dao.StockRepository;
+import com.kronsoft.project.dto.ProductDto;
 import com.kronsoft.project.dto.StockDto;
+import com.kronsoft.project.entities.Product;
 import com.kronsoft.project.entities.Stock;
 
 @Service
@@ -24,14 +29,9 @@ public class StockService {
 	private ProductRepository productRepository;
 	
 	public List<Stock> getAllStocks(){
-		return stockRepository.findAll();
+		return stockRepository.findAll(Sort.by(Sort.Direction.ASC, "productProductName"));
 	}
 	 
-	public StockDto stockToPersist(StockDto stockDto) {
-		Stock stock = new Stock(stockDto);
-		return new StockDto(stockRepository.save(stock));
-	}
-	
 	public StockDto updateStock(StockDto stockDto) {
 		Optional<Stock> stockOpt = stockRepository.findById(stockDto.getId());
 		//stockOpt.ifPresentOrElse((stock) -> {
@@ -61,14 +61,31 @@ public class StockService {
 	}
 
 	public StockDto getStockById(Long id) {
-		return new StockDto(stockRepository.findByStockId(id));
+		Optional<Stock> stockOpt = stockRepository.findById(id);
+		if(stockOpt.isPresent()) {
+			Stock stock = stockOpt.get();
+			return new StockDto(stock);
+		} else {
+			throw new EntityNotFoundException("Stock not found");
+		}
 	}
 
 	public StockDto getStockByProductPzn(String pzn) {
-		return new StockDto(stockRepository.findByProductPzn(pzn));
+		Optional<Stock> stockOpt = stockRepository.findByProductPzn(pzn);
+		
+		if(stockOpt.isPresent()) {
+			Stock stock = stockOpt.get();
+			return new StockDto(stock);
+		} else {
+			throw new EntityNotFoundException("Stock not found");
+		}
 	}
 	
-//	private StockDto createStock(Product ) {
-//		StockDto stock
-//	}
+	public StockDto createStockForProduct(ProductDto product) {
+		Stock stock = new Stock();
+		stock.setPrice(new BigDecimal(0.00).setScale(2, RoundingMode.HALF_EVEN));
+		stock.setQuantity(0L);
+		stock.setProduct(new Product(product));
+		return new StockDto(stockRepository.save(stock));
+	}
 }

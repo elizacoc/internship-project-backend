@@ -1,5 +1,7 @@
 package com.kronsoft.project.validators;
 
+import java.util.Objects;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
@@ -9,6 +11,9 @@ public class PasswordValidator implements ConstraintValidator<PasswordConstraint
 
 	@Override
 	public boolean isValid(String rawPassword, ConstraintValidatorContext context) {
+		if(Objects.isNull(rawPassword)) {
+			return false;
+		}
 		if(!rawPassword.matches(PASSWORD_PATTERN)) {
 			return false;
 		}
